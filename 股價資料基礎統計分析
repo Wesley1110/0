@@ -46,3 +46,64 @@ print("Daily volatility", daily_vol)
 print("Monthly volatility", monthly_vol)
 print("Annual volatility", annual_vol)
 
+
+# WeekAnalysis 星期分析(星期效應)
+import numpy as np
+from datetime import datetime
+
+def datestr2num(ndary):    # 定義函數 日期格式轉星期
+    lstdates = list(ndary)
+    strdates = list()
+    weekdates = list()
+    num = len(lstdates)
+    for i in range(num):
+        strdates.append(str(lstdates[i]))
+        weekdates.append(datetime.strptime(strdates[i], "%d-%m-%Y").date().weekday())  # 原日期格式 "%d-%m-%Y"            
+    return weekdates
+
+
+def pricestr2flt(ndary):    # price data轉float (原本是str)  
+    lstprice = list(ndary)
+    fltprice = list()
+    strprice = list()
+    num = len(lstprice)
+    for i in range(num):
+        strprice.append(str(lstprice[i]))
+        fltprice.append(float(strprice[i]))
+    return fltprice
+
+# Monday 0, Tuesday 1, Wednesday 2, Thursday 3, Friday 4, Saturday 5, Sunday 6
+nddates, ndclose = np.loadtxt('data.csv', dtype='str', delimiter=',', usecols=(1, 6), unpack=True)
+print(nddates)
+print(ndclose)
+
+# 原本日期與價格都是str，現在執行先前定義的函式轉成我們要的格式
+fltclose = list()
+fltclose = pricestr2flt(ndclose)  # pricestr2flt 函式
+print(fltclose)
+
+weekdates = list()
+weekdates = datestr2num(nddates)  # datestr2num 函式
+print(weekdates)
+
+# 列出每個(週一)的所有價格(週二、週三...週五)並計算平均數
+averages = np.zeros(5)
+ndweekdates = np.array(weekdates)
+ndclose = np.array(fltclose)
+for i in range(5):
+    indices = np.where(ndweekdates == i)
+    prices = np.take(ndclose, indices)
+    avg = np.mean(prices)
+    print("Day", i, "prices", prices, "Average", avg)
+    averages[i] = avg
+
+# 找出星期幾的平均價格最高    
+top = np.max(averages)
+print("Highest average", top)
+print("Top day of the week", np.argmax(averages))
+
+# 找出星期幾的平均價格最低
+bottom = np.min(averages)
+print("Lowest average", bottom)
+print("Bottom day of the week", np.argmin(averages))
+
