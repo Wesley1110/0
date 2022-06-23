@@ -1,0 +1,48 @@
+# load stock price data(CSV file, 7 column)
+# stock, date, open, high, low, close, vol
+import numpy as np
+c, v = np.loadtxt('data.csv', delimiter=',', usecols=(6,7), unpack=True)  # 取第6,7個column
+
+print(c)  # 30筆data
+print(v)
+
+
+# 計算VWAP(value weighted average price)，用vol當作權重計算價格加權平均數
+vwap = np.average(c, weights = v)
+print("VWAP = ", vwap)
+
+
+print(np.max(c))  # maximum
+print(np.min(c))  # minimum
+print(np.median(c))  # median
+
+sorted_close = np.msort(c)  # 排序
+print(sorted_close)
+
+print(np.var(c))  # variance
+
+# 計算股票報酬率
+# session (1) 傳統報酬率
+import numpy as np
+c = np.loadtxt('data.csv', delimiter=',', usecols=(6,), unpack=True) # len(c)=30(筆), 0...29
+returns = np.diff(c) / c[:-1] # c[:-1] : 0~28不含最後一筆, diff(c)一階差分 : 0~28
+print(c)
+print(np.diff(c))  # 29筆data
+print(c[:-1])      # 29筆data
+print("Standard deviation =", np.std(returns))  # std
+
+# session (2) 對數報酬率
+logreturns = np.diff(np.log(c))
+posretindices = np.where(returns>0) # Tuple 取得正報酬
+print(logreturns)
+print(posretindices)
+print("Indices with positive returns", posretindices)
+
+# 計算股票波動度(標準差)
+daily_vol = np.std(logreturns)
+annual_vol = daily_vol * np.sqrt(252.)  # 年化標準差
+monthly_vol = annual_vol * np.sqrt(1./12.)
+print("Daily volatility", daily_vol)
+print("Monthly volatility", monthly_vol)
+print("Annual volatility", annual_vol)
+
