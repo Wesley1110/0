@@ -46,8 +46,9 @@ print("Daily volatility", daily_vol)
 print("Monthly volatility", monthly_vol)
 print("Annual volatility", annual_vol)
 
-
-# WeekAnalysis 星期分析(星期效應)
+###################################
+## WeekAnalysis 星期分析(星期效應)##
+###################################
 import numpy as np
 from datetime import datetime
 
@@ -106,4 +107,83 @@ print("Top day of the week", np.argmax(averages))
 bottom = np.min(averages)
 print("Lowest average", bottom)
 print("Bottom day of the week", np.argmin(averages))
+
+##########################
+## Week Summary 完整週分析#
+##########################
+
+import numpy as np
+from datetime import datetime
+
+# Monday 0, Tuesday 1, Wednesday 2, Thursday 3, Friday 4, Saturday 5, Sunday 6
+def datestr2num(ndary):
+    lstdates = list(ndary)
+    strdates = list()
+    weekdates = list()
+    num = len(lstdates)
+    for i in range(num):
+        strdates.append(str(lstdates[i]))
+        weekdates.append(datetime.strptime(strdates[i], "%d-%m-%Y").date().weekday())
+        nddates = np.array(weekdates)
+    return nddates
+
+def pricestr2flt(ndary):
+    lstprice = list(ndary)
+    fltprice = list()
+    strprice = list()
+    num = len(lstprice)
+    for i in range(num):
+        strprice.append(str(lstprice[i]))
+        fltprice.append(float(strprice[i]))
+        ndprice = np.array(fltprice)
+    return ndprice
+
+nddates, ndopen, ndhigh, ndlow, ndclose = np.loadtxt('data.csv', dtype='str', delimiter=',', \
+    usecols=(1, 3, 4, 5, 6), unpack=True)  # 定義 column 1, 3, 4, 5, 6
+
+dates = list()
+dates = datestr2num(nddates)
+open = list()
+open = pricestr2flt(ndclose)
+high = list()
+high = pricestr2flt(ndhigh)
+low = list()
+low = pricestr2flt(ndlow)
+close = list()
+close = pricestr2flt(ndclose)
+
+print(dates)  # output為數字0~4 週一到週五
+print(open)
+print(high)
+
+# 只取其中前15筆data
+close = close[:16]
+dates = dates[:16]
+
+# get first Monday 找出第一筆星期一的index
+first_monday = np.ravel(np.where(dates == 0))[0]
+print("The first Monday index is", first_monday)  # 1
+
+# get last Friday 找出最後一個星期五的index
+last_friday = np.ravel(np.where(dates == 4))[-1]
+print("The last Friday index is", last_friday)  # 15
+
+# 取出week index
+weeks_indices = np.arange(first_monday, last_friday + 1)  # index 1~15 15天 = 3週 
+print("Weeks indices initial", weeks_indices)  # [ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15]
+
+weeks_indices = np.split(weeks_indices, 3)  # 切分為3週
+print("Weeks indices after split", weeks_indices)  # print出切分後的index
+
+#  每一週的開高低收 o h l c
+def summarize(a, o, h, l, c):
+    monday_open = o[a[0]]              # a[0] 每一週的星期一
+    week_high = np.max(np.take(h, a))  # 每一週取出最大值
+    week_low = np.min(np.take(l, a))
+    friday_close = c[a[-1]]
+    return("APPL", monday_open, week_high, week_low, friday_close)
+
+weeksummary = np.apply_along_axis(summarize, 1, weeks_indices, open, high, low, close)
+print("Week summary", weeksummary)
+np.savetxt("weeksummary.csv", weeksummary, delimiter=",", fmt="%s")
 
