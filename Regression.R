@@ -1,5 +1,5 @@
 ## Regression-- Estimation of conditional mean
-dataUsed1=read.csv("C:\\Users\\Wesley\\Desktop\\109計量經濟\\data\\tips.csv")
+dataUsed1=read.csv("C:\\tips.csv")
 head(dataUsed1)
 tail(dataUsed1)
 
