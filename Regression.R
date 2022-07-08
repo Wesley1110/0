@@ -45,10 +45,10 @@ EY=predict(output_1A)
 Performance=forecast::accuracy(Y,EY)
 Performance[,c("RMSE","MAE","MAPE")]
 
-Error=output_1A$residuals
+Error=output_1A$residuals    #  驗算上面的Performance指標
 sqrt(mean(Error^2))
 mean(abs(Error))
-mean(abs(Error/EY))
+mean(abs(Error/EY))    #  上面的MAPE單位是%
 
 ##===Case 2 
 Eq2=as.formula("tip ~ total_bill + time")
