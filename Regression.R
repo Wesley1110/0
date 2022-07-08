@@ -85,6 +85,12 @@ papeR::prettify(summary(output_1A), confint = FALSE)
 p=papeR::prettify(summary(output_1A), confint = FALSE)
 write.csv(p,file="C:\\p.csv")
 
+#用stargazer套件輸出
+library(stargazer)
+
+stargazer(output_1A, title = "result", align = TRUE)    #  沒輸入type則預設是 LaTeX code，可用線上 reader 讀取
+stargazer(output_1A, output_1B, title="result", align=TRUE,type = "html",out = "C:\\output.htm")    #  輸出 html 檔，點開就是網頁版 output
+
 # 資料存在異質變異 Since we know the IID assumption no longer holds, we need the package "sandwich" to construct new estimators
 library(sandwich)
 white=vcovHC(output_1B, type="HC0")    # ("HC0","HC1","HC2","HC3","HC4","HC4m”, “HC5”)
