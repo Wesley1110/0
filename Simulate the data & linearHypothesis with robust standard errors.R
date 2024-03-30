@@ -44,5 +44,50 @@ linearHypothesis(lm.fit, c("x = 0"), vcov = NeweyWest(lm.fit))
 
 
 
+# Estimate the parameters with OLS and test the hypothesis(b1=0),with and without the robust standard errors. In each simulation,
+# record if the test statistics reject the null or not. Repeat the simulation 1,000 times and report the average
+# rejection rate for each types of tests.
+
+# Set the number of simulations
+num_simulations <- 1000
+# Initialize rejection counts
+reject_count_without_robust <- 0
+reject_count_with_robust <- 0
+
+# Perform simulations and hypothesis tests
+for (i in 1:num_simulations) {
+  # Generate data
+  x <- rnorm(n, mean=0, sd=1)
+  epsilon <- rnorm(n, mean=0, sd=1 + abs(x))
+  y <- 0.5 + 0*x + epsilon
+  
+  # Fit the linear model
+  lm.fit <- lm(y ~ x)
+  
+  # Perform hypothesis test without using robust standard errors
+  test_without_robust <- linearHypothesis(lm.fit, "x = 0")
+  # Record rejection if at least one p-value is less than 0.05
+  if (any(!is.na(test_without_robust$"Pr(>F)") & test_without_robust$"Pr(>F)" < 0.05)) {
+    reject_count_without_robust <- reject_count_without_robust + 1
+  }
+  
+  # Perform hypothesis test using robust standard errors
+  robust_se <- vcovHC(lm.fit, type = "HC0")
+  test_with_robust <- linearHypothesis(lm.fit, "x = 0", vcov = robust_se)
+  # Record rejection if at least one p-value is less than 0.05
+  if (any(!is.na(test_with_robust$"Pr(>F)") & test_with_robust$"Pr(>F)" < 0.05)) {
+    reject_count_with_robust <- reject_count_with_robust + 1
+  }
+}
+
+# Compute average rejection rates
+average_rejection_rate_without_robust <- reject_count_without_robust / num_simulations
+average_rejection_rate_with_robust <- reject_count_with_robust / num_simulations
+
+# Output results
+average_rejection_rate_without_robust  # output: 0.159
+average_rejection_rate_with_robust     # output: 0.065 with robust std.的情況下，結果較為正確。
+
+
 
 
